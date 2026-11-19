@@ -19,13 +19,15 @@ if [[ "$tag" == v* ]]; then
   tag="${tag:1}"
 fi
 
-# Function to detect prerelease (e.g. 1.2.3-beta, 1.2.3-rc.1)
-# Note: Distro suffixes such as -rancher.X are not treated as prereleases.
+# Function to detect prerelease:
+# If using _rancher, any hyphen after _rancher marks a prerelease (e.g. _rancher.1-rc.1)
+# Otherwise standard SemVer applies (e.g. 1.2.3-rc.1)
 has_prerelease() {
-  local clean_tag
-  clean_tag=$(echo "$1" | sed -E 's/-(rancher|suse)([.-]?[0-9]+)*//g')
-
-  [[ "$clean_tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+- ]] || [[ "$clean_tag" =~ (-|\.)(alpha|beta|rc|preview|dev)[0-9]* ]]
+  if [[ "$1" =~ _rancher ]]; then
+    [[ "$1" =~ _rancher.*- ]]
+  else
+    [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+- ]]
+  fi
 }
 
 # Function to detect build metadata (e.g. 1.2.3+build.1)
