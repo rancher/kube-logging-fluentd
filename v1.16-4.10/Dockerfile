@@ -2,7 +2,7 @@
 # https://gallery.ecr.aws/sumologic/kubernetes-fluentd
 FROM public.ecr.aws/sumologic/kubernetes-fluentd:1.16.5-sumo-0-alpine AS sumo
 
-FROM ruby:3.2.5-alpine3.20 AS base
+FROM ruby:3.2-alpine3.20 AS base
 
 ARG BUILD_DEPS=" \
       make gcc g++ libc-dev \
@@ -23,7 +23,8 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
 
 COPY --from=sumo --chown=fluent:fluent /usr/local/bundle /usr/local/bundle
 
-RUN apk add --no-cache \
+RUN apk update && apk upgrade \
+&& apk add --no-cache \
         ca-certificates \
         ruby ruby-irb ruby-etc \
         tini libmaxminddb geoip \
@@ -37,7 +38,7 @@ RUN apk add --no-cache \
  # need to rebuild these gems to have the extensions installed
  && fluent-gem install \
          bigdecimal:1.4.4 \
-         oj:3.16.1 \
+         oj:3.17.3 \
          google-protobuf:3.25.5 \
          nio4r:2.7.3 \
          snappy:0.3.0 \
